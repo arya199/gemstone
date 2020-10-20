@@ -10,4 +10,8 @@ class ConverterActivity: DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.converter_act)
     }
+
+    fun getSomething(): String {
+        return "something"
+    }
 }
