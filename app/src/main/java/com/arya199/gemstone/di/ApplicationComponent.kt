@@ -10,8 +10,9 @@ import javax.inject.Singleton
 
 @Singleton
 @Component(modules = [
+    ConverterModule::class,
     AndroidInjectionModule::class,
-    ConverterModule::class
+    RetrofitModule::class
 ])
 interface ApplicationComponent: AndroidInjector<GemstoneApplication> {
 

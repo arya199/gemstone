@@ -11,7 +11,7 @@
 
     <fragment
         android:id="@+id/converter_grid_frag"
-        class="com.arya199.gemstone.converter.ConverterGridFragment"
+        class="com.arya199.gemstone.rate.RateGridFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>
