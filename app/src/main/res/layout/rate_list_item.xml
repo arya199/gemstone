@@ -7,27 +7,27 @@
     </data>
     <LinearLayout
         android:orientation="horizontal" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/flagTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView" />
+            android:text="@{rate.from}" />
 
         <TextView
             android:id="@+id/codeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView2" />
+            android:text="@{rate.to}" />
 
         <TextView
             android:id="@+id/rateTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="TextView3" />
+            android:text="@{rate.rate.toString()}" />
     </LinearLayout>
 </layout>

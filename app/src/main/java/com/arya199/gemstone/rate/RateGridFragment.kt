@@ -39,6 +39,8 @@ class RateGridFragment: DaggerFragment() {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
         setupListAdapter()
+
+        sharedViewModel.loadRates()
     }
 
     private fun setupListAdapter() {

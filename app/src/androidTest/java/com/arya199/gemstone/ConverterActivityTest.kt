@@ -2,12 +2,14 @@ package com.arya199.gemstone
 
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.arya199.gemstone.converter.ConverterActivity
+import com.arya199.gemstone.data.Rate
+import com.arya199.gemstone.rate.RateAdapter
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,7 +31,7 @@ class ConverterActivityTest {
     }
 
     @Test
-    fun testLaunch() {
+    fun testLaunchEmptyRate() {
         // This actually works
         /*
         activityScenario.onActivity { activity ->
@@ -45,5 +47,11 @@ class ConverterActivityTest {
 //        onView(withId(R.id.codeTextView)).check(matches(isDisplayed()))
 //        onView(withId(R.id.rateTextView)).check(matches(isDisplayed()))
         onView(withId(R.id.rate_empty_textView)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun testLaunchScrollToJPY() {
+        onView(withId(R.id.rate_list)).perform(
+            RecyclerViewActions.scrollTo<RateAdapter.ViewHolder>(hasDescendant(withText("JPY"))))
     }
 }
