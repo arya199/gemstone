@@ -4,9 +4,11 @@ import androidx.lifecycle.ViewModel
 import com.arya199.gemstone.converter.ConverterActivity
 import com.arya199.gemstone.rate.RateGridFragment
 import com.arya199.gemstone.converter.ConverterInputFragment
+import com.arya199.gemstone.converter.CurrencyViewModel
 import com.arya199.gemstone.data.source.CurrencyLayerDataSource
 import com.arya199.gemstone.data.source.CurrencyLayerRepository
 import com.arya199.gemstone.data.source.DefaultCurrencyLayerRepository
+import com.arya199.gemstone.data.source.local.CurrencyLayerLocalDataSource
 import com.arya199.gemstone.data.source.remote.CurrencyLayerRemoteDataSource
 import com.arya199.gemstone.data.source.remote.FakeRemoteDataSource
 import com.arya199.gemstone.rate.RateViewModel
@@ -23,7 +25,7 @@ abstract class ConverterModule {
     @ContributesAndroidInjector
     internal abstract fun ConverterActivity(): ConverterActivity
 
-    @ContributesAndroidInjector
+    @ContributesAndroidInjector(modules = [ViewModelBuilder::class])
     internal abstract fun ConverterInputFragment(): ConverterInputFragment
 
     @ContributesAndroidInjector(modules = [ViewModelBuilder::class])
@@ -37,7 +39,12 @@ abstract class ConverterModule {
     @Binds
     @IntoMap
     @ViewModelKey(RateViewModel::class)
-    abstract fun bindViewModel(viewModel: RateViewModel): ViewModel
+    abstract fun bindRateViewModel(viewModel: RateViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(CurrencyViewModel::class)
+    abstract fun bindCurrencyViewModel(viewModel: CurrencyViewModel): ViewModel
 
     @Binds
     @RealRemoteDataSourceAnnotation
@@ -49,11 +56,23 @@ abstract class ConverterModule {
     internal abstract fun bindFakeRemoteDataSource(dataSource:
         FakeRemoteDataSource): CurrencyLayerDataSource
 
+    @Binds
+    @LocalDataSourceAnnotation
+    internal abstract fun bindLocalDataSource(dataSource:
+        CurrencyLayerLocalDataSource): CurrencyLayerDataSource
+
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)
     annotation class RealRemoteDataSourceAnnotation
 
+    /**
+     * This shouldn't be here.
+     */
     @Qualifier
     @Retention(AnnotationRetention.RUNTIME)
     annotation class FakeRemoteDataSourceAnnotation
+
+    @Qualifier
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class LocalDataSourceAnnotation
 }
