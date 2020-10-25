@@ -25,7 +25,8 @@ class CurrencyLayerRemoteDataSource @Inject constructor(retrofit: Retrofit): Cur
             }
             Result.Success(rateToReturn)
         } else {
-            Result.Error(Exception("Failure on getting Quote List from remote"))
+            Result.Error(Exception("Failure on getting Quote List from remote: " +
+                    "${liveResponse.error.code} : ${liveResponse.error.info}"))
         }
     }
 

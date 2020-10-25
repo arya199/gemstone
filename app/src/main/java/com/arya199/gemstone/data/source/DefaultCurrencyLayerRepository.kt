@@ -34,10 +34,6 @@ class DefaultCurrencyLayerRepository @Inject constructor(
         }
     }
 
-    override suspend fun getRate(amount: Double, source: String, to: String): Result<List<Rate>> {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun getExchangeList(): Result<List<Currency>> {
         return withContext(ioDispatcher) {
             val listExchangeResult = fetchExchangeListFromLocalOrRemote()
@@ -70,6 +66,10 @@ class DefaultCurrencyLayerRepository @Inject constructor(
         when (val remoteRateList = remoteDataSource.getLiveRate()) {
             is Result.Success -> {
                 refreshRateLocalDataSource(remoteRateList.data)
+                if (forceUpdate) {
+                    // Also update full text for each of our live rate.
+
+                }
                 return remoteRateList
             }
             is Result.Error -> Timber.w("Remote data source fetch failed")
@@ -111,8 +111,6 @@ class DefaultCurrencyLayerRepository @Inject constructor(
         for (rate in rates) {
             localDataSource.saveRate(rate)
         }
-        // TODO: Not ideal, but we want to make sure the loaded rate had a full text on the first run
-        localDataSource.getLiveRate()
     }
 
     private fun errorReport() {

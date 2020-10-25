@@ -28,6 +28,13 @@ class FakeRemoteDataSource @Inject constructor(): CurrencyLayerDataSource {
             rateToReturn.add(Rate(from = from, to = end, rate = convertedJson.quotes[key]))
         }
         return Result.Success(rateToReturn)
+        /**
+         * Example faulty Json.
+         */
+//        val jsonExample = "{\"success\": false,\"error\": {\"code\": 104,\"info\": " +
+//                "\"Your monthly usage limit has been reached. Please upgrade your subscription plan.}}"
+//        val convertedJson = Gson().fromJson<LiveResponse>(jsonExample, LiveResponse::class.java)
+//        return Result.Error()
     }
 
     override suspend fun getCurrencyList(): Result<List<Currency>> {

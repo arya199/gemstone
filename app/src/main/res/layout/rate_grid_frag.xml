@@ -6,6 +6,9 @@
         <variable
             name="rateViewModel"
             type="com.arya199.gemstone.rate.RateViewModel" />
+        <variable
+            name="fragmentHandler"
+            type="com.arya199.gemstone.rate.RateGridFragment.RateGridFragmentHandler" />
     </data>
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"
@@ -17,20 +20,27 @@
             android:gravity="center"
             android:background="#22D2E4F5"
             android:textSize="8sp"/>
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rate_list"
-            android:layout_height="match_parent"
-            android:layout_width="match_parent"
-            android:visibility="@{rateViewModel.rates.size() > 0 ? View.VISIBLE: View.GONE}"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:rates="@{rateViewModel.rates}"
-            />
-        <TextView
-            android:id="@+id/rate_empty_textView"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:visibility="@{rateViewModel.rates.size() > 0 ? View.GONE: View.VISIBLE}"
-            android:text="No Data Shown"/>
+            app:onRefreshListener="@{fragmentHandler::onRefresh}"
+            app:refreshing="@{rateViewModel.dataLoading}">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rate_list"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:visibility="@{rateViewModel.rates.size() > 0 ? View.VISIBLE: View.GONE}"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:rates="@{rateViewModel.rates}"
+                />
+            <TextView
+                android:id="@+id/rate_empty_textView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:visibility="@{rateViewModel.rates.size() > 0 ? View.GONE: View.VISIBLE}"
+                android:text="@{rateViewModel.errorText}"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </layout>

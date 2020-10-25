@@ -38,7 +38,7 @@ class CurrencyLayerApiTest {
     @Test
     fun testLiveApi() {
         runBlocking {
-            val result = repository.getRates()
+            val result = repository.getRates(true)
             if (result.succeeded) {
                 when (result) {
                     is Result.Success -> {
@@ -99,7 +99,7 @@ class CurrencyLayerApiTest {
     @Test
     fun testLiveApi_then_CheckLocaDatabase() {
         runBlocking {
-            val result = repository.getRates()
+            val result = repository.getRates(false)
             if (result.succeeded) {
                 when (result) {
                     is Result.Success -> {
@@ -112,7 +112,7 @@ class CurrencyLayerApiTest {
                 }
             }
             // This should not hit remote.
-            repository.getRates()
+            repository.getRates(false)
             // Check local database
             val rateList = db.rateDao().getRates()
             assertEquals(168, rateList.size)

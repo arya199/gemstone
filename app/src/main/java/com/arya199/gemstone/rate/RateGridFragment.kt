@@ -6,12 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.arya199.gemstone.PreferenceHelper
 import com.arya199.gemstone.PreferenceHelper.lastLiveUpdate
 import com.arya199.gemstone.PreferenceHelper.shouldLiveUpdate
 import com.arya199.gemstone.databinding.RateGridFragBinding
 import dagger.android.support.DaggerFragment
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -37,6 +37,7 @@ class RateGridFragment: DaggerFragment() {
         viewDataBinding = RateGridFragBinding.inflate(inflater, container, false)
             .apply {
                 rateViewModel = sharedViewModel
+                fragmentHandler = RateGridFragmentHandler()
             }
         return viewDataBinding.root
     }
@@ -49,10 +50,9 @@ class RateGridFragment: DaggerFragment() {
         val prefHelperShouldUpdate = prefHelper.shouldLiveUpdate()
         sharedViewModel.loadRates(prefHelperShouldUpdate) {
             if (prefHelperShouldUpdate) prefHelper.lastLiveUpdate = it
-            Timber.w("Check everything ${prefHelper.lastLiveUpdate} $prefHelperShouldUpdate ")
-            val sdf = SimpleDateFormat("MM/dd/yyyy HH:mm")
+            val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm")
             val netDate = Date(prefHelper.lastLiveUpdate)
-            viewDataBinding.liveLastUpdateText.text = "Last update ${sdf.format(netDate)}"
+            viewDataBinding.liveLastUpdateText.text = "Last update: ${sdf.format(netDate)}"
         }
     }
 
@@ -61,6 +61,22 @@ class RateGridFragment: DaggerFragment() {
         if (viewModel != null) {
             listAdapter = RateAdapter()
             viewDataBinding.rateList.adapter = listAdapter
+        }
+    }
+
+    inner class RateGridFragmentHandler {
+
+        fun onRefresh() {
+            val viewModel = viewDataBinding.rateViewModel
+            val prefHelper = PreferenceHelper.customPreference(viewDataBinding.root.context)
+            if (viewModel != null) {
+                sharedViewModel.loadRates(true) {
+                    prefHelper.lastLiveUpdate = it
+                    val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm")
+                    val netDate = Date(prefHelper.lastLiveUpdate)
+                    viewDataBinding.liveLastUpdateText.text = "Last update: ${sdf.format(netDate)}"
+                }
+            }
         }
     }
 }

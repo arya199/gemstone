@@ -14,13 +14,6 @@ interface CurrencyLayerRepository {
     suspend fun getRates(forceUpdate: Boolean): Result<List<Rate>>
 
     /**
-     * Given amount, source, and to, return list of all rates applicable. Restrictions are
-     * similar to getRates function, and added caveat as well that since we're in a basic plan
-     * all conversions but USD will go through in-device computation first.
-     */
-    suspend fun getRate(amount: Double, source: String, to: String): Result<List<Rate>>
-
-    /**
      * Mainly to be used during the population of Spinner down on currency selection, also used as
      * a reference to interpret country code. Always hit local, unless no data has yet to be
      * registered.

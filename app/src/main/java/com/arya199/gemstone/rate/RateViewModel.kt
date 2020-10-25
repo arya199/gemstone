@@ -14,7 +14,7 @@ import com.arya199.gemstone.data.source.CurrencyLayerRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.pow
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class RateViewModel @Inject constructor(
     private val currencyLayerRepository: CurrencyLayerRepository
@@ -22,6 +22,9 @@ class RateViewModel @Inject constructor(
 
     private val _dataLoading = MutableLiveData<Boolean>()
     val dataLoading: LiveData<Boolean> = _dataLoading
+
+    private val _errorText = MutableLiveData<String>().apply { value = "No Data Shown" }
+    val errorText: LiveData<String> = _errorText
 
     private val _rates = MutableLiveData<List<Rate>>().apply { value = emptyList() }
     val rates: LiveData<List<Rate>> = _rates
@@ -61,13 +64,22 @@ class RateViewModel @Inject constructor(
                 val ratesToShow = ArrayList<Rate>()
                 for (rate in rates) {
                     rate.rate = rate.rate?.let { roundDouble(it) }
+                    if (rate.fullText.isBlank() && !currencies.value.isNullOrEmpty()) {
+                        val currencyIndex = currencies.value!!.indexOfFirst {
+                            it.code.equals(rate.to, true)
+                        }
+                        if (currencyIndex != -1) rate.fullText = currencies.value!![currencyIndex].fullText
+                    }
                     ratesToShow.add(rate)
                 }
+                _dataLoading.value = false
                 _rates.value = ArrayList(ratesToShow)
                 update(System.currentTimeMillis())
             }
             else {
+                _dataLoading.value = false
                 // TODO: If error, figure out what to tell user about it.
+                _errorText.value = rateResult.toString()
             }
         }
     }
@@ -88,6 +100,7 @@ class RateViewModel @Inject constructor(
 
     fun convert(amount: Double, from: String) {
         viewModelScope.launch {
+            _dataLoading.value = true
             val showRates = currencyLayerRepository.getRates(false)
             if (showRates is Result.Success) {
                 val rates = showRates.data
@@ -112,17 +125,22 @@ class RateViewModel @Inject constructor(
                         else {
                             newRateToShow.add(Rate(from, rate.to,
                                 rate.rate?.times(usdBase)?.let { roundDouble(it) },
+                                //rate.rate?.times(usdBase),
                                 rate.fullText))
                         }
                     }
                 }
                 _rates.value = ArrayList(newRateToShow)
             }
+            else {
+                _errorText.value = "Problem in converting"
+            }
+            _dataLoading.value = false
         }
     }
 
     private fun roundDouble(rate: Double): Double {
         val factor = 10.0.pow(4.toDouble())
-        return (rate * factor).roundToInt() / factor
+        return (rate * factor).roundToLong() / factor
     }
 }

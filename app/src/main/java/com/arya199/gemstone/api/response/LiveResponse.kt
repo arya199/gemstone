@@ -6,5 +6,6 @@ data class LiveResponse(
     var privacy: String,
     var timestamp: Long,
     var source: String,
-    var quotes: Map<String, Double>
+    var quotes: Map<String, Double>,
+    var error: ErrorResponse
 )
