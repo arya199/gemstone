@@ -4,24 +4,26 @@
     <data>
         <variable
             name="currencyViewModel"
-            type="com.arya199.gemstone.converter.CurrencyViewModel" />
+            type="com.arya199.gemstone.rate.RateViewModel" />
     </data>
     <LinearLayout
-        android:orientation="vertical" android:layout_width="match_parent"
+        android:orientation="horizontal" android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <EditText
             android:id="@+id/currency_input_amount_text"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="NameX" />
+            android:text="" />
 
         <Spinner
             android:id="@+id/currency_input_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:currencies="@{currencyViewModel.currencies}"
+            app:onCurrencyChange="@={currencyViewModel.selectedCurrency}"/>
 
     </LinearLayout>
 </layout>

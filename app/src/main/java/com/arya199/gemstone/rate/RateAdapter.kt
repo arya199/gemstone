@@ -41,7 +41,7 @@ class RateAdapter: ListAdapter<Rate, RateAdapter.ViewHolder>(RateDiffCallback())
         }
 
         override fun areContentsTheSame(oldItem: Rate, newItem: Rate): Boolean {
-            return oldItem.to.compareTo(newItem.to, false) == 0
+            return oldItem.rate == newItem.rate
         }
     }
 }

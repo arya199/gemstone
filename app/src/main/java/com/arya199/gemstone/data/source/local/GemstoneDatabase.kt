@@ -8,4 +8,6 @@ import com.arya199.gemstone.data.Rate
 @Database(entities = [Currency::class, Rate::class], exportSchema = false, version = 1)
 abstract class GemstoneDatabase: RoomDatabase() {
     abstract fun currencyDao(): CurrencyDao
+
+    abstract fun rateDao(): RateDao
 }

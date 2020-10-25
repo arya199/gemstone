@@ -41,7 +41,9 @@ class BasicArchitectureTest {
     @Test
     fun testDatabase() {
         runBlocking {
-            // TODO: It doesn't work, somehow? currencyList is always zero
+            // TODO: It doesn't work, somehow? currencyList is always zero.
+            // This might have something to do with databases on test are always destroyed at
+            // the end and started anew every time?
             val currencyList = database.currencyDao().getCurrencies()
             print(currencyList.size)
         }

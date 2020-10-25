@@ -24,30 +24,15 @@ class DefaultCurrencyLayerRepository @Inject constructor(
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     override suspend fun getRates(): Result<List<Rate>> {
-        val liveRateResult = fakeRemoteDataSource.getLiveRate()
-        val rate = mutableListOf<Rate>()
-        if (liveRateResult.succeeded) {
-            when (liveRateResult) {
-                is Result.Success -> {
-                    val liveResponse = liveRateResult.data
-                    if (liveResponse.success) {
-                        val allKeys = liveResponse.quotes.keys
-                        for (key in allKeys) {
-                            val from = key.substring(0, 3)
-                            val end = key.substring(3, key.length)
-                            rate.add(Rate(from = from, to = end, rate = liveResponse.quotes[key]))
-                        }
-                    }
-                    else {
-                        errorReport()
-                    }
-                }
-                is Result.Error -> {
-                    Result.Error(liveRateResult.exception)
+        return withContext(ioDispatcher) {
+            val liveRateResult = fetchRateListFromLocaOrRemote()
+            (liveRateResult as? Result.Success)?.let {
+                if (it.data.isNotEmpty()) {
+                    return@withContext Result.Success(it.data)
                 }
             }
+            return@withContext Result.Error(Exception("Illegal state"))
         }
-        return Result.Success(rate)
     }
 
     override suspend fun getRate(amount: Double, source: String, to: String): Result<List<Rate>> {
@@ -71,6 +56,26 @@ class DefaultCurrencyLayerRepository @Inject constructor(
      * among others.
      */
 
+    private suspend fun fetchRateListFromLocaOrRemote(): Result<List<Rate>> {
+        when (val localRateList = localDataSource.getLiveRate()) {
+            is Result.Success -> {
+                // TODO: Add a condition for stale data
+                if (localRateList.data.isNotEmpty()) {
+                    return localRateList
+                }
+            }
+            is Result.Error -> Timber.w("Local data source fetch failed")
+        }
+        when (val remoteRateList = remoteDataSource.getLiveRate()) {
+            is Result.Success -> {
+                refreshRateLocalDataSource(remoteRateList.data)
+                return remoteRateList
+            }
+            is Result.Error -> Timber.w("Remote data source fetch failed")
+        }
+        return Result.Error(Exception("Error fetching from remote and local"))
+    }
+
     private suspend fun fetchExchangeListFromLocalOrRemote(): Result<List<Currency>> {
         // First, hit the local database, then if there are none, or the data is stale (let's make it
         // one day to define stale data for exchange list data, then hit remote
@@ -83,10 +88,10 @@ class DefaultCurrencyLayerRepository @Inject constructor(
             }
             is Result.Error -> Timber.w("Local data source fetch failed")
         }
-        when (val liveRateResult = remoteDataSource.getCurrencyList()) {
+        when (val exchangeListResult = remoteDataSource.getCurrencyList()) {
             is Result.Success -> {
-                refreshCurrencyLocalDataSource(liveRateResult.data)
-                return liveRateResult
+                refreshCurrencyLocalDataSource(exchangeListResult.data)
+                return exchangeListResult
             }
             is Result.Error -> Timber.w("Remote data source fetch failed")
         }
@@ -97,6 +102,13 @@ class DefaultCurrencyLayerRepository @Inject constructor(
         // TODO: Do we need the delete table before hand? Probably not.
         for (currency in currencies) {
             localDataSource.saveCurrency(currency)
+        }
+    }
+
+    private suspend fun refreshRateLocalDataSource(rates: List<Rate>) {
+        // TODO: Is UPDATE on conflict strategy enough?
+        for (rate in rates) {
+            localDataSource.saveRate(rate)
         }
     }
 
