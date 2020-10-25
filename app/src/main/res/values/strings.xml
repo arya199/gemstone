@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Gemstone</string>
+    <string name="flag_content_description">Country\'s flag</string>
+    <string name="simple_line_separator">Simple line separator</string>
 </resources>

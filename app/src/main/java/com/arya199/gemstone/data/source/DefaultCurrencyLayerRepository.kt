@@ -3,7 +3,6 @@ package com.arya199.gemstone.data.source
 import com.arya199.gemstone.data.Currency
 import com.arya199.gemstone.data.Rate
 import com.arya199.gemstone.data.Result
-import com.arya199.gemstone.data.succeeded
 import com.arya199.gemstone.di.ConverterModule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +22,9 @@ class DefaultCurrencyLayerRepository @Inject constructor(
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    override suspend fun getRates(): Result<List<Rate>> {
+    override suspend fun getRates(forceUpdate: Boolean): Result<List<Rate>> {
         return withContext(ioDispatcher) {
-            val liveRateResult = fetchRateListFromLocaOrRemote()
+            val liveRateResult = fetchRateListFromLocalOrRemote(forceUpdate)
             (liveRateResult as? Result.Success)?.let {
                 if (it.data.isNotEmpty()) {
                     return@withContext Result.Success(it.data)
@@ -56,15 +55,17 @@ class DefaultCurrencyLayerRepository @Inject constructor(
      * among others.
      */
 
-    private suspend fun fetchRateListFromLocaOrRemote(): Result<List<Rate>> {
-        when (val localRateList = localDataSource.getLiveRate()) {
-            is Result.Success -> {
-                // TODO: Add a condition for stale data
-                if (localRateList.data.isNotEmpty()) {
-                    return localRateList
+    private suspend fun fetchRateListFromLocalOrRemote(forceUpdate: Boolean): Result<List<Rate>> {
+        if (!forceUpdate) {
+            when (val localRateList = localDataSource.getLiveRate()) {
+                is Result.Success -> {
+                    // TODO: Add a condition for stale data
+                    if (localRateList.data.isNotEmpty()) {
+                        return localRateList
+                    }
                 }
+                is Result.Error -> Timber.w("Local data source fetch failed")
             }
-            is Result.Error -> Timber.w("Local data source fetch failed")
         }
         when (val remoteRateList = remoteDataSource.getLiveRate()) {
             is Result.Success -> {
@@ -110,6 +111,8 @@ class DefaultCurrencyLayerRepository @Inject constructor(
         for (rate in rates) {
             localDataSource.saveRate(rate)
         }
+        // TODO: Not ideal, but we want to make sure the loaded rate had a full text on the first run
+        localDataSource.getLiveRate()
     }
 
     private fun errorReport() {

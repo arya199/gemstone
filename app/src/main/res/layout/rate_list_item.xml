@@ -1,33 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="rate"
             type="com.arya199.gemstone.data.Rate" />
+
     </data>
     <LinearLayout
-        android:orientation="horizontal" android:layout_width="match_parent"
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/flagTextView"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_weight="1"
+                android:contentDescription="@string/flag_content_description"
+                app:context="@{context}"
+                app:flag="@{rate.to}" />
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3">
+                <TextView
+                    android:id="@+id/codeTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:textSize="14sp"
+                    android:gravity="start|bottom"
+                    android:text="@{rate.to}"/>
 
-        <TextView
-            android:id="@+id/flagTextView"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/fullTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="start|top"
+                    android:text="@{rate.fullText}"
+                    android:textSize="10sp" />
+            </LinearLayout>
+            <TextView
+                android:id="@+id/rateTextView"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:textSize="18sp"
+                android:gravity="center|center_vertical"
+                android:text="@{rate.rate.toString()}" />
+        </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@{rate.from}" />
-
-        <TextView
-            android:id="@+id/codeTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@{rate.to}" />
-
-        <TextView
-            android:id="@+id/rateTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@{rate.rate.toString()}" />
+            android:background="@drawable/ic_underline"
+            android:contentDescription="@string/simple_line_separator" />
     </LinearLayout>
 </layout>

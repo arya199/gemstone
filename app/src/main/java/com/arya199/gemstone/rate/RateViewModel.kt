@@ -13,6 +13,8 @@ import com.arya199.gemstone.data.Result
 import com.arya199.gemstone.data.source.CurrencyLayerRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.pow
+import kotlin.math.roundToInt
 
 class RateViewModel @Inject constructor(
     private val currencyLayerRepository: CurrencyLayerRepository
@@ -39,17 +41,30 @@ class RateViewModel @Inject constructor(
         })
     }
 
-    fun loadRates() {
+    private val _inputAmountEvent = MutableLiveData<Event<String>>()
+    val inputAmountEvent: LiveData<Event<String>> = _inputAmountEvent
+
+    val inputAmount = ObservableField<String>().apply {
+        addOnPropertyChangedCallback(object : Observable.OnPropertyChangedCallback(){
+            override fun onPropertyChanged(sender: Observable?, propertyId: Int) {
+                _inputAmountEvent.value = Event(this@apply.get()!!)
+            }
+        })
+    }
+
+    fun loadRates(shouldUpdateLive: Boolean, update: (Long) -> Unit) {
         _dataLoading.value = true
         viewModelScope.launch {
-            val rateResult = currencyLayerRepository.getRates()
+            val rateResult = currencyLayerRepository.getRates(shouldUpdateLive)
             if (rateResult is Result.Success) {
                 val rates = rateResult.data
                 val ratesToShow = ArrayList<Rate>()
                 for (rate in rates) {
+                    rate.rate = rate.rate?.let { roundDouble(it) }
                     ratesToShow.add(rate)
                 }
                 _rates.value = ArrayList(ratesToShow)
+                update(System.currentTimeMillis())
             }
             else {
                 // TODO: If error, figure out what to tell user about it.
@@ -73,7 +88,7 @@ class RateViewModel @Inject constructor(
 
     fun convert(amount: Double, from: String) {
         viewModelScope.launch {
-            val showRates = currencyLayerRepository.getRates()
+            val showRates = currencyLayerRepository.getRates(false)
             if (showRates is Result.Success) {
                 val rates = showRates.data
                 var usdBase = 1.0
@@ -87,19 +102,27 @@ class RateViewModel @Inject constructor(
                 for (rate in rates) {
                     // The most straightforward way is when the from is USD so do that first
                     if (from.equals("USD", true)) {
-                        newRateToShow.add(Rate(from, rate.to, rate.rate?.times(amount)))
+                        newRateToShow.add(Rate(from, rate.to,
+                            rate.rate?.times(amount)?.let { roundDouble(it) }, rate.fullText))
                     }
                     else {
                         if (rate.to.equals(from, true)) {
-                            newRateToShow.add(Rate(from, "USD", rate.rate?.times(usdBase)))
+                            newRateToShow.add(Rate(from, "USD", roundDouble(usdBase), rate.fullText))
                         }
                         else {
-                            newRateToShow.add(Rate(from, rate.to, rate.rate?.times(usdBase)))
+                            newRateToShow.add(Rate(from, rate.to,
+                                rate.rate?.times(usdBase)?.let { roundDouble(it) },
+                                rate.fullText))
                         }
                     }
                 }
                 _rates.value = ArrayList(newRateToShow)
             }
         }
+    }
+
+    private fun roundDouble(rate: Double): Double {
+        val factor = 10.0.pow(4.toDouble())
+        return (rate * factor).roundToInt() / factor
     }
 }

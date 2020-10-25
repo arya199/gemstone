@@ -5,20 +5,31 @@
             name="currency"
             type="com.arya199.gemstone.data.Currency" />
     </data>
+
     <LinearLayout
-        android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/currency_code"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{currency.code}" />
 
         <TextView
             android:id="@+id/currency_full_text"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{currency.fullText}" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_underline"/>
     </LinearLayout>
 </layout>

@@ -1,6 +1,5 @@
 package com.arya199.gemstone.converter
 
-import android.util.Log
 import androidx.databinding.Observable
 import androidx.databinding.ObservableField
 import androidx.lifecycle.LiveData

@@ -10,6 +10,13 @@
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/live_last_update_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:background="#22D2E4F5"
+            android:textSize="8sp"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rate_list"
             android:layout_height="match_parent"

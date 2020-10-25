@@ -17,7 +17,11 @@ class CurrencyLayerLocalDataSource @Inject constructor(
 
     override suspend fun getLiveRate(): Result<List<Rate>> = withContext(ioDispatcher) {
         return@withContext try {
-            Result.Success(db.rateDao().getRates())
+            val ratesList = db.rateDao().getRates()
+            for (rate in ratesList) {
+                rate.fullText = db.currencyDao().getFullText(rate.to)
+            }
+            Result.Success(ratesList)
         } catch (e: Exception) {
             Result.Error(e)
         }

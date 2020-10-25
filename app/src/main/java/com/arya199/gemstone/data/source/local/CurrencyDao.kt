@@ -12,6 +12,9 @@ interface CurrencyDao {
     @Query("SELECT * FROM currency_table")
     suspend fun getCurrencies(): List<Currency>
 
+    @Query("SELECT fullText FROM currency_table WHERE code = :code")
+    suspend fun getFullText(code: String): String
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(currency: Currency)
 }

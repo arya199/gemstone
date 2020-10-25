@@ -11,7 +11,7 @@ interface CurrencyLayerRepository {
      * it is reasonably fresh, within thirty minutes of last update. Or remote source if
      * local store data is stale, or did not exist.
      */
-    suspend fun getRates(): Result<List<Rate>>
+    suspend fun getRates(forceUpdate: Boolean): Result<List<Rate>>
 
     /**
      * Given amount, source, and to, return list of all rates applicable. Restrictions are
