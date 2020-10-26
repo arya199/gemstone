@@ -2,16 +2,12 @@ package com.arya199.gemstone
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 
 object PreferenceHelper {
-    val GEMSTONE_SHARED_PREFS = "Gemstone Shared Prefs"
+    const val GEMSTONE_SHARED_PREFS = "Gemstone Shared Prefs"
     // Both are unix timestamp
-    val LAST_LIVE_RATE_UPDATE = "live"
-    val LAST_CURRENCY_LIST_UPDATE = "currency"
-
-    fun defaultPreference(context: Context): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+    const val LAST_LIVE_RATE_UPDATE = "live"
+    const val LAST_CURRENCY_LIST_UPDATE = "currency"
 
     fun customPreference(context: Context): SharedPreferences = context.getSharedPreferences(
         GEMSTONE_SHARED_PREFS, Context.MODE_PRIVATE)

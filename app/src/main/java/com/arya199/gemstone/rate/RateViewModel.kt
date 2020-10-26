@@ -32,6 +32,12 @@ class RateViewModel @Inject constructor(
     private val _currencies = MutableLiveData<List<Currency>>().apply { value = emptyList() }
     val currencies: LiveData<List<Currency>> = _currencies
 
+    private val _currentAmount = MutableLiveData<Double>().apply { value = 1.0 }
+    val currentAmount: LiveData<Double> = _currentAmount
+
+    private val _currentCode = MutableLiveData<String>().apply { value = "USD" }
+    val currentCode: LiveData<String> = _currentCode
+
     // String on this event is the currency's three digits code
     private val _selectCurrencyEvent = MutableLiveData<Event<String>>()
     val selectCurrencyEvent: LiveData<Event<String>> = _selectCurrencyEvent
@@ -98,9 +104,15 @@ class RateViewModel @Inject constructor(
         }
     }
 
+    fun reconvert() {
+        convert(currentAmount.value!!, currentCode.value!!)
+    }
+
     fun convert(amount: Double, from: String) {
         viewModelScope.launch {
             _dataLoading.value = true
+            _currentAmount.value = amount
+            _currentCode.value = from
             val showRates = currencyLayerRepository.getRates(false)
             if (showRates is Result.Success) {
                 val rates = showRates.data

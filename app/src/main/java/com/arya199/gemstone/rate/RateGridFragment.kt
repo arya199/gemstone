@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.arya199.gemstone.PreferenceHelper
 import com.arya199.gemstone.PreferenceHelper.lastLiveUpdate
 import com.arya199.gemstone.PreferenceHelper.shouldLiveUpdate
@@ -75,6 +74,7 @@ class RateGridFragment: DaggerFragment() {
                     val sdf = SimpleDateFormat("MMM dd, yyyy HH:mm")
                     val netDate = Date(prefHelper.lastLiveUpdate)
                     viewDataBinding.liveLastUpdateText.text = "Last update: ${sdf.format(netDate)}"
+                    sharedViewModel.reconvert()
                 }
             }
         }
